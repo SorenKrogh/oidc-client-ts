@@ -29,6 +29,7 @@ export interface ExchangeRefreshTokenArgs {
     grant_type?: string;
     refresh_token: string;
     scope?: string;
+    extraTokenParams?: Record<string, unknown>;
 
     timeoutInSeconds?: number;
 }
@@ -123,7 +124,18 @@ export class TokenClient {
 
         const params = new URLSearchParams({ grant_type });
         for (const [key, value] of Object.entries(args)) {
-            if (value != null) {
+            if (typeof value !== "string") {
+                try {
+                    if (typeof value !== "number") {
+                        const record = value as Record<string, unknown>;
+                        for (const key in record) {
+                            params.append(key, record[key] as string);
+                        }
+                    }
+                } catch (err) {
+                    logger.error("failed to parse record params.", err instanceof Error ? err.message : err);
+                }
+            } else if (value != null) {
                 params.set(key, value);
             }
         }

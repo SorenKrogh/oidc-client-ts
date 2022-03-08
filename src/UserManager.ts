@@ -227,7 +227,12 @@ export class UserManager {
         let user = await this._loadUser();
         if (user?.refresh_token) {
             logger.debug("using refresh token");
-            const state = new RefreshState(user as Required<User>);
+            const requiredUser = user as Required<User>;
+            const augmentedRefreshState = {
+                ...requiredUser,
+                extraTokenParams: args.extraTokenParams,
+            };
+            const state = new RefreshState(augmentedRefreshState);
             return await this._useRefreshToken(state);
         }
 

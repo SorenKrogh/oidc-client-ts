@@ -168,6 +168,7 @@ export class OidcClient {
         const result = await this._tokenClient.exchangeRefreshToken({
             refresh_token: state.refresh_token,
             scope: state.scope,
+            extraTokenParams: state.extraTokenParams,
             timeoutInSeconds,
         });
         const response = new SigninResponse(new URLSearchParams());
